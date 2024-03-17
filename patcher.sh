@@ -39,19 +39,13 @@ if ! [ -f /data/data/com.termux/files/usr/bin/apkmod ]; then
 fi
 
 # Clone the repository
-git clone -b "$BRANCH" "${REPO_URL}" "${DATA_FOLDER}"
-cd "${DATA_FOLDER}"
-
-# Archive the specified folder
-git archive --format zip --output data.zip "$PATCH_FOLDER"
+git archive --remote="${REPO_URL}" --format=zip --output="${DATA_FOLDER}.zip" "${BRANCH}:${PATCH_FOLDER}"
 
 # Extract the downloaded patch data
-yes | unzip data.zip -d ./
+unzip -q "${DATA_FOLDER}.zip" -d "${DATA_FOLDER}"
 
 # Remove the downloaded zip file
-rm data.zip
-
-# Rest of your script goes here...
+rm "${DATA_FOLDER}.zip"
 
 set -
 #check for AM2R_11.zip in downloads
