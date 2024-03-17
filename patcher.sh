@@ -5,8 +5,8 @@ set -e
 VERSION="15_5"
 OUTPUT="am2r_${VERSION}"
 DATA_FOLDER="data"
-REPO_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android"
-HQ_MUSIC_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android/raw/main/HDR_HQ_in-game_music/"
+REPO_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android/main/data/"
+HQ_MUSIC_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android/main/HDR_HQ_in-game_music/"
 
 cleanup_directories() {
     local directories=("assets" "AM2RWrapper" "$DATA_FOLDER" "HDR_HQ_in-game_music")
@@ -16,8 +16,6 @@ cleanup_directories() {
         fi
     done
 }
-
-cleanup_directories  # Call the function here
 
 echo "-------------------------------------------"
 echo ""
@@ -42,13 +40,12 @@ fi
 # Clone the repository
 git clone "${REPO_URL}" "${DATA_FOLDER}"
 
-# Move only the "data" folder and its contents
-mv "${DATA_FOLDER}/data"/* "${DATA_FOLDER}"
-rm -rf "${DATA_FOLDER}/data"
+# If you only need specific folders, move them to the desired directory
+mv "${DATA_FOLDER}/folder1"/* "${DATA_FOLDER}"
+mv "${DATA_FOLDER}/folder2"/* "${DATA_FOLDER}"
 
-# Move "HDR_HQ_in-game_music" folder
-mv "${DATA_FOLDER}/HDR_HQ_in-game_music"/* "${DATA_FOLDER}"
-rm -rf "${DATA_FOLDER}/HDR_HQ_in-game_music"
+# Clean up
+rm -rf "${DATA_FOLDER}/folder1" "${DATA_FOLDER}/folder2"
 
 # Check for AM2R_11.zip in downloads
 if [ ! -f "AM2R_11.zip" ]; then
