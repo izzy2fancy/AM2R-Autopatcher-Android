@@ -5,7 +5,7 @@ set -e
 VERSION="15_5"
 OUTPUT="am2r_${VERSION}"
 DATA_FOLDER="data"
-REPO_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android/raw/main/data/"
+REPO_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android"
 HQ_MUSIC_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android/raw/main/HDR_HQ_in-game_music/"
 
 cleanup_directories() {
@@ -39,10 +39,16 @@ if ! [ -f /data/data/com.termux/files/usr/bin/apkmod ]; then
     rm -f setup.sh
 fi
 
-# Download Data Folder
-curl -L "${REPO_URL}" -o "${DATA_FOLDER}.zip"
-unzip -q "${DATA_FOLDER}.zip" -d "${DATA_FOLDER}"
-rm "${DATA_FOLDER}.zip"
+# Clone the repository
+git clone "${REPO_URL}" "${DATA_FOLDER}"
+
+# Move only the "data" folder and its contents
+mv "${DATA_FOLDER}/data"/* "${DATA_FOLDER}"
+rm -rf "${DATA_FOLDER}/data"
+
+# Move "HDR_HQ_in-game_music" folder
+mv "${DATA_FOLDER}/HDR_HQ_in-game_music"/* "${DATA_FOLDER}"
+rm -rf "${DATA_FOLDER}/HDR_HQ_in-game_music"
 
 # Check for AM2R_11.zip in downloads
 if [ ! -f "AM2R_11.zip" ]; then
