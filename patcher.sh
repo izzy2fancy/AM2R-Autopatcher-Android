@@ -1,21 +1,33 @@
 #!/bin/bash
 
+# exit on any error to avoid showing everything was successfull even tho it wasnt
 set -e
 
 VERSION="15_5"
-OUTPUT="am2r_${VERSION}"
-DATA_FOLDER="data"
-REPO_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android/"
-HQ_MUSIC_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android/raw/main/HDR_HQ_in-game_music/"
+OUTPUT="am2r_"${VERSION}
+INPUT=""
 
-cleanup_directories() {
-    local directories=("assets" "AM2RWrapper" "$DATA_FOLDER" "HDR_HQ_in-game_music")
-    for dir in "${directories[@]}"; do
-        if [ -d "$dir" ]; then
-            rm -rf "$dir"
-        fi
-    done
-}
+# Cleanup in case the dirs exists 
+if [ -d "$OUTPUT" ]; then
+    rm -r ${OUTPUT}
+fi
+
+if [ -d "assets/" ]; then
+    rm -rf assets/
+fi
+
+if [ -d "AM2RWrapper/" ]; then
+    rm -rf AM2RWrapper/
+fi
+
+if [ -d "data/" ]; then
+    rm -rf data/
+fi
+if [ -d "HDR_HQ_in-game_music/" ]; then
+    rm -rf HDR_HQ_in-game_music
+fi
+    rm -rf data.zip
+    rm -rf HDR_HQ_in-game_music.zip
 
 echo "-------------------------------------------"
 echo ""
@@ -25,50 +37,47 @@ echo "Updated by izzy2fancy"
 echo ""
 echo "-------------------------------------------"
 
-# Install dependencies
-# Assuming you're on a Termux environment
+#install dependencies
 yes | pkg install termux-am zip unzip xdelta3
 yes | termux-setup-storage
 
-# Check and install apkmod if not installed
+#check if apkmod is instaled, if not install it. I only use this for signing 'cause it's the only way I found this to work
 if ! [ -f /data/data/com.termux/files/usr/bin/apkmod ]; then
     wget https://raw.githubusercontent.com/Hax4us/Apkmod/master/setup.sh
     bash setup.sh
     rm -f setup.sh
 fi
 
-# Clone the repository
-git clone "${REPO_URL}" "${DATA_FOLDER}"
+#Download Data Folder
+wget -r -np -nH --cut-dirs=2 -R "index.html*" "https://github.com/izzy2fancy/AM2R-Autopatcher-Android/tree/main/data"
 
-# If you only need specific folders, move them to the desired directory
-mv "${DATA_FOLDER}/folder1"/* "${DATA_FOLDER}"
-mv "${DATA_FOLDER}/folder2"/* "${DATA_FOLDER}"
-
-# Clean up
-rm -rf "${DATA_FOLDER}/folder1" "${DATA_FOLDER}/folder2"
-
-# Check for AM2R_11.zip in downloads
-if [ ! -f "AM2R_11.zip" ]; then
+#check for AM2R_11.zip in downloads
+if [ -f ~/storage/downloads/AM2R_11.zip ]; then
+    echo "AM2R_11.zip found! Extracting to ${OUTPUT}"
+    #extract the content to the am2r_xx folder
+    unzip -q ~/storage/downloads/AM2R_11.zip -d "${OUTPUT}"
+else
     echo -e "\033[0;31mAM2R_11 not found. Place AM2R_11.zip (case sensitive) into your Downloads folder and try again."
     echo -e "\033[1;37m"
     exit -1
 fi
 
-echo "AM2R_11.zip found! Extracting to ${OUTPUT}"
-unzip -q "AM2R_11.zip" -d "$OUTPUT"
-
 echo "Applying Android patch..."
-xdelta3 -dfs "${OUTPUT}/data.win" "${DATA_FOLDER}/droid.xdelta" "${OUTPUT}/game.droid"
+xdelta3 -dfs "${OUTPUT}"/data.win data/droid.xdelta  "${OUTPUT}"/game.droid
+#cp data/android/AM2RWrapper.apk utilities/android/
 
-# Delete unnecessary files
-rm "${OUTPUT}/D3DX9_43.dll" "${OUTPUT}/AM2R.exe" "${OUTPUT}/data.win" 
+#delete unnecessary files
+rm "${OUTPUT}"/D3DX9_43.dll "${OUTPUT}"/AM2R.exe "${OUTPUT}"/data.win 
 
-if [ -f "${DATA_FOLDER}/android/AM2R.ini" ]; then
-    cp -p "${DATA_FOLDER}/android/AM2R.ini" "$OUTPUT/"
+#cp -RTp "${OUTPUT}"/ utilities/android/assets/
+if [ -f data/android/AM2R.ini ]; then
+    cp -p data/android/AM2R.ini "${OUTPUT}"/
 fi
 
+
 # Music
-cp "${DATA_FOLDER}/files_to_copy/"*.ogg "$OUTPUT/"
+#mkdir -p utilities/android/assets/lang
+cp data/files_to_copy/*.ogg "${OUTPUT}"/
 
 echo ""
 echo -e "\033[0;32mInstall high quality in-game music? Increases filesize by 230 MB and may lag the game\!"
@@ -80,40 +89,55 @@ echo ""
 
 if [ "$INPUT" = "y" ]; then
     echo "Downloading HQ music..."
-    curl -LO "${HQ_MUSIC_URL}HQ_music.zip"
-    unzip -q "HQ_music.zip" -d "HDR_HQ_in-game_music"
-    rm "HQ_music.zip"
-    mv "HDR_HQ_in-game_music" "$DATA_FOLDER/"
+    wget https://github.com/izzy2fancy/AM2R-Autopatcher-Android/releases/download/2.0/HDR_HQ_in-game_music.zip
+yes | unzip HDR_HQ_in-game_music.zip -d ./
     echo "Copying HQ music..."
-    cp -f "${DATA_FOLDER}/HDR_HQ_in-game_music/"*.ogg "$OUTPUT/"
+    cp -f HDR_HQ_in-game_music/*.ogg "${OUTPUT}"/
+    rm -rf HDR_HQ_in-game_music/
 fi
 
 echo "Updating lang folder..."
-rm -R "${OUTPUT}/lang/"
-cp -RTp "${DATA_FOLDER}/files_to_copy/lang/" "${OUTPUT}/lang/"
+#remove old lang
+rm -R "${OUTPUT}"/lang/
+#install new lang
+cp -RTp data/files_to_copy/lang/ "${OUTPUT}"/lang/
 
 echo "Renaming music to lowercase..."
+#I can't figure out a better way to mass rename files to lowercase
+#so zipping them without compression and extracting them as all lowercase it is
+#music needs to be all lowercase
 zip -0qr temp.zip "${OUTPUT}"/*.ogg
 rm "${OUTPUT}"/*.ogg
 unzip -qLL temp.zip
 rm temp.zip
 
 echo "Packaging APK..."
-apkmod -d -i "${DATA_FOLDER}/android/AM2RWrapper.apk" -o AM2RWrapper
-mv "$OUTPUT" assets
+#decompile the apk
+apkmod -d -i data/android/AM2RWrapper.apk -o AM2RWrapper
+#copy
+mv "${OUTPUT}" assets
 cp -Rp assets AM2RWrapper
+#edited yaml thing to not compress ogg's
+echo "Editing apktool.yml..."
 sed -i "s/doNotCompress:/doNotCompress:\n- ogg/" AM2RWrapper/apktool.yml
+#build
+# check if aapt2 exists, if not use aapt instead
 if [ -f /usr/bin/aapt2 ]; then
-    apkmod -r -i AM2RWrapper -o "AM2R-${VERSION}.apk"
+    apkmod -r -i AM2RWrapper -o AM2R-"${VERSION}".apk
 else
-    apkmod -a -r -i AM2RWrapper -o "AM2R-${VERSION}.apk"
+    apkmod -a -r -i AM2RWrapper -o AM2R-"${VERSION}".apk
 fi
-apkmod -s -i "AM2R-${VERSION}.apk" -o "AM2R-${VERSION}-signed.apk"
+#Sign apk
+apkmod -s -i AM2R-"${VERSION}".apk -o AM2R-"${VERSION}"-signed.apk
 
-rm -R assets/ AM2RWrapper/ "$DATA_FOLDER" "AM2R-${VERSION}.apk"
-mv "AM2R-${VERSION}-signed.apk" "AM2R-${VERSION}-signed.apk"
+# Cleanup
+rm -R assets/ AM2RWrapper/ data/ AM2R-"${VERSION}".apk
+
+# Move signed APK
+mv AM2R-"${VERSION}"-signed.apk ~/storage/downloads/AM2R-"${VERSION}"-signed.apk
 
 echo ""
-echo -e "\033[0;32mThe operation was completed successfully and the APK can be found as \"AM2R-${VERSION}-signed.apk\"."
+echo -e "\033[0;32mThe operation was completed successfully and the APK can be found in your Downloads folder as \"AM2R-${VERSION}-signed.apk\"."
 echo -e "\033[0;32mSee you next mission\!"
 echo -e "\033[1;37m"
+xdg-open ~/storage/downloads/AM2R-"${VERSION}"-signed.apk
