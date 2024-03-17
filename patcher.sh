@@ -6,7 +6,8 @@ VERSION="15_5"
 OUTPUT="am2r_${VERSION}"
 DATA_FOLDER="data"
 REPO_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android"
-PATCH_FOLDER="main/data"
+BRANCH="main"
+PATCH_FOLDER="data"
 
 cleanup_directories() {
     local directories=("assets" "AM2RWrapper" "$DATA_FOLDER" "HDR_HQ_in-game_music")
@@ -38,8 +39,10 @@ if ! [ -f /data/data/com.termux/files/usr/bin/apkmod ]; then
 fi
 
 # Clone the repository
-git clone "${REPO_URL}" "${DATA_FOLDER}"
+git clone -b "$BRANCH" "${REPO_URL}" "${DATA_FOLDER}"
 cd "${DATA_FOLDER}"
+
+# Archive the specified folder
 git archive --format zip --output data.zip "$PATCH_FOLDER"
 
 # Extract the downloaded patch data
@@ -47,7 +50,10 @@ yes | unzip data.zip -d ./
 
 # Remove the downloaded zip file
 rm data.zip
-    
+
+# Rest of your script goes here...
+
+set -
 #check for AM2R_11.zip in downloads
 if [ -f ~/storage/downloads/AM2R_11.zip ]; then
     echo "AM2R_11.zip found! Extracting to ${OUTPUT}"
