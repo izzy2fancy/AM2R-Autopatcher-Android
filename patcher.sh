@@ -1,33 +1,21 @@
 #!/bin/bash
 
-# exit on any error to avoid showing everything was successfull even tho it wasnt
 set -e
 
 VERSION="15_5"
-OUTPUT="am2r_"${VERSION}
-INPUT=""
+OUTPUT="am2r_${VERSION}"
+DATA_FOLDER="data"
+REPO_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android"
+PATCH_FOLDER="main/data"
 
-# Cleanup in case the dirs exists 
-if [ -d "$OUTPUT" ]; then
-    rm -r ${OUTPUT}
-fi
-
-if [ -d "assets/" ]; then
-    rm -rf assets/
-fi
-
-if [ -d "AM2RWrapper/" ]; then
-    rm -rf AM2RWrapper/
-fi
-
-if [ -d "data/" ]; then
-    rm -rf data/
-fi
-if [ -d "HDR_HQ_in-game_music/" ]; then
-    rm -rf HDR_HQ_in-game_music
-fi
-    rm -rf data.zip
-    rm -rf HDR_HQ_in-game_music.zip
+cleanup_directories() {
+    local directories=("assets" "AM2RWrapper" "$DATA_FOLDER" "HDR_HQ_in-game_music")
+    for dir in "${directories[@]}"; do
+        if [ -d "$dir" ]; then
+            rm -rf "$dir"
+        fi
+    done
+}
 
 echo "-------------------------------------------"
 echo ""
@@ -37,22 +25,29 @@ echo "Updated by izzy2fancy"
 echo ""
 echo "-------------------------------------------"
 
-#install dependencies
+# Install dependencies
+# Assuming you're on a Termux environment
 yes | pkg install termux-am zip unzip xdelta3
 yes | termux-setup-storage
 
-#check if apkmod is instaled, if not install it. I only use this for signing 'cause it's the only way I found this to work
+# Check and install apkmod if not installed
 if ! [ -f /data/data/com.termux/files/usr/bin/apkmod ]; then
     wget https://raw.githubusercontent.com/Hax4us/Apkmod/master/setup.sh
     bash setup.sh
     rm -f setup.sh
 fi
 
-#download the patch data
-wget https://github.com/izzy2fancy/AM2R-Autopatcher-Android/releases/download/1.0/data.zip
-yes | unzip data.zip -d ./
-    
+# Clone the repository
+git clone "${REPO_URL}" "${DATA_FOLDER}"
+cd "${DATA_FOLDER}"
+git archive --format zip --output data.zip "$PATCH_FOLDER"
 
+# Extract the downloaded patch data
+yes | unzip data.zip -d ./
+
+# Remove the downloaded zip file
+rm data.zip
+    
 #check for AM2R_11.zip in downloads
 if [ -f ~/storage/downloads/AM2R_11.zip ]; then
     echo "AM2R_11.zip found! Extracting to ${OUTPUT}"
