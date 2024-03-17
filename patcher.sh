@@ -40,9 +40,9 @@ if ! [ -f /data/data/com.termux/files/usr/bin/apkmod ]; then
 fi
 
 # Download Data Folder
-curl -LO "${REPO_URL}data.zip"
-unzip -q "data.zip" -d "$DATA_FOLDER"
-rm "data.zip"
+curl -L "${REPO_URL}" -o "${DATA_FOLDER}.zip"
+unzip -q "${DATA_FOLDER}.zip" -d "${DATA_FOLDER}"
+rm "${DATA_FOLDER}.zip"
 
 # Check for AM2R_11.zip in downloads
 if [ ! -f "AM2R_11.zip" ]; then
