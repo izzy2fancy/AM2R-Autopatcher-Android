@@ -17,7 +17,7 @@ cleanup_directories() {
     done
 }
 
-# Rest of the script goes here
+cleanup_directories
 
 echo "-------------------------------------------"
 echo ""
