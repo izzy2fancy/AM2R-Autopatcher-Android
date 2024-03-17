@@ -5,7 +5,7 @@ set -e
 VERSION="15_5"
 OUTPUT="am2r_${VERSION}"
 DATA_FOLDER="data"
-REPO_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android/raw/main/data/"
+REPO_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android/"
 HQ_MUSIC_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android/raw/main/HDR_HQ_in-game_music/"
 
 cleanup_directories() {
