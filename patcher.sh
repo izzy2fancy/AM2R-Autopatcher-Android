@@ -5,8 +5,8 @@ set -e
 VERSION="15_5"
 OUTPUT="am2r_${VERSION}"
 DATA_FOLDER="data"
-DOWNLOADS_DIR="$HOME/storage/downloads"
-HQ_MUSIC_URL="HDR_HQ_in-game_music"
+REPO_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android"
+HQ_MUSIC_URL="$REPO_URL/HDR_HQ_in-game_music"
 
 cleanup_directories() {
     local directories=("assets" "AM2RWrapper" "$DATA_FOLDER" "HDR_HQ_in-game_music")
@@ -15,10 +15,7 @@ cleanup_directories() {
             rm -rf "$dir"
         fi
     done
-    rm -rf data.zip HDR_HQ_in-game_music.zip
 }
-
-cleanup_directories
 
 echo "-------------------------------------------"
 echo ""
@@ -40,17 +37,17 @@ if ! [ -f /data/data/com.termux/files/usr/bin/apkmod ]; then
 fi
 
 # Download Data Folder
-wget -r -np -nH --cut-dirs=2 -R "index.html*" "https://github.com/izzy2fancy/AM2R-Autopatcher-Android/data"
+wget -r -np -nH --cut-dirs=2 -R "index.html*" "$REPO_URL/data"
 
 # Check for AM2R_11.zip in downloads
-if [ ! -f "$DOWNLOADS_DIR/AM2R_11.zip" ]; then
+if [ ! -f "AM2R_11.zip" ]; then
     echo -e "\033[0;31mAM2R_11 not found. Place AM2R_11.zip (case sensitive) into your Downloads folder and try again."
     echo -e "\033[1;37m"
     exit -1
 fi
 
 echo "AM2R_11.zip found! Extracting to ${OUTPUT}"
-unzip -q "$DOWNLOADS_DIR/AM2R_11.zip" -d "$OUTPUT"
+unzip -q "AM2R_11.zip" -d "$OUTPUT"
 
 echo "Applying Android patch..."
 xdelta3 -dfs "${OUTPUT}/data.win" "${DATA_FOLDER}/droid.xdelta" "${OUTPUT}/game.droid"
@@ -75,11 +72,10 @@ echo ""
 
 if [ "$INPUT" = "y" ]; then
     echo "Downloading HQ music..."
-    wget "$HQ_MUSIC_URL"
-    yes | unzip HDR_HQ_in-game_music.zip -d ./
+    wget -r -np -nH --cut-dirs=3 -R "index.html*" "$HQ_MUSIC_URL"
+    mv HDR_HQ_in-game_music "$DATA_FOLDER/"
     echo "Copying HQ music..."
-    cp -f HDR_HQ_in-game_music/*.ogg "$OUTPUT/"
-    rm -rf HDR_HQ_in-game_music/
+    cp -f "${DATA_FOLDER}/HDR_HQ_in-game_music/"*.ogg "$OUTPUT/"
 fi
 
 echo "Updating lang folder..."
@@ -105,10 +101,9 @@ fi
 apkmod -s -i "AM2R-${VERSION}.apk" -o "AM2R-${VERSION}-signed.apk"
 
 rm -R assets/ AM2RWrapper/ "$DATA_FOLDER" "AM2R-${VERSION}.apk"
-mv "AM2R-${VERSION}-signed.apk" "$DOWNLOADS_DIR/AM2R-${VERSION}-signed.apk"
+mv "AM2R-${VERSION}-signed.apk" "AM2R-${VERSION}-signed.apk"
 
 echo ""
-echo -e "\033[0;32mThe operation was completed successfully and the APK can be found in your Downloads folder as \"AM2R-${VERSION}-signed.apk\"."
+echo -e "\033[0;32mThe operation was completed successfully and the APK can be found as \"AM2R-${VERSION}-signed.apk\"."
 echo -e "\033[0;32mSee you next mission\!"
 echo -e "\033[1;37m"
-xdg-open "$DOWNLOADS_DIR/AM2R-${VERSION}-signed.apk"
