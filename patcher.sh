@@ -40,7 +40,7 @@ if ! [ -f /data/data/com.termux/files/usr/bin/apkmod ]; then
 fi
 
 # Download Data Folder
-wget -r -np -nH --cut-dirs=2 -R "index.html*" "https://github.com/izzy2fancy/AM2R-Autopatcher-Android/tree/main/data"
+wget -r -np -nH --cut-dirs=2 -R "index.html*" "https://github.com/izzy2fancy/AM2R-Autopatcher-Android/data"
 
 # Check for AM2R_11.zip in downloads
 if [ ! -f "$DOWNLOADS_DIR/AM2R_11.zip" ]; then
