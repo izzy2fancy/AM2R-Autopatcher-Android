@@ -5,8 +5,8 @@ set -e
 VERSION="15_5"
 OUTPUT="am2r_${VERSION}"
 DATA_FOLDER="data"
-REPO_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android/raw/main/data"
-HQ_MUSIC_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android/raw/main/HDR_HQ_in-game_music"
+REPO_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android/raw/main/data/"
+HQ_MUSIC_URL="https://github.com/izzy2fancy/AM2R-Autopatcher-Android/raw/main/HDR_HQ_in-game_music/"
 
 cleanup_directories() {
     local directories=("assets" "AM2RWrapper" "$DATA_FOLDER" "HDR_HQ_in-game_music")
@@ -19,10 +19,6 @@ cleanup_directories() {
 
 cleanup_directories  # Call the function here
 
-# Rest of the script goes here
-
-cleanup_directories
-
 echo "-------------------------------------------"
 echo ""
 echo "AM2R 1.5.5 Shell Autopatching Utility"
@@ -32,6 +28,7 @@ echo ""
 echo "-------------------------------------------"
 
 # Install dependencies
+# Assuming you're on a Termux environment
 yes | pkg install termux-am zip unzip xdelta3
 yes | termux-setup-storage
 
@@ -43,7 +40,9 @@ if ! [ -f /data/data/com.termux/files/usr/bin/apkmod ]; then
 fi
 
 # Download Data Folder
-wget -r -np -nH --cut-dirs=2 -R "index.html*" "$REPO_URL/data"
+curl -LO "${REPO_URL}data.zip"
+unzip -q "data.zip" -d "$DATA_FOLDER"
+rm "data.zip"
 
 # Check for AM2R_11.zip in downloads
 if [ ! -f "AM2R_11.zip" ]; then
@@ -78,8 +77,10 @@ echo ""
 
 if [ "$INPUT" = "y" ]; then
     echo "Downloading HQ music..."
-    wget -r -np -nH --cut-dirs=3 -R "index.html*" "$HQ_MUSIC_URL"
-    mv HDR_HQ_in-game_music "$DATA_FOLDER/"
+    curl -LO "${HQ_MUSIC_URL}HQ_music.zip"
+    unzip -q "HQ_music.zip" -d "HDR_HQ_in-game_music"
+    rm "HQ_music.zip"
+    mv "HDR_HQ_in-game_music" "$DATA_FOLDER/"
     echo "Copying HQ music..."
     cp -f "${DATA_FOLDER}/HDR_HQ_in-game_music/"*.ogg "$OUTPUT/"
 fi
