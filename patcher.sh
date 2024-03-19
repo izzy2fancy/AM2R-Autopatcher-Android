@@ -41,7 +41,7 @@ fi
 
 # Download data folder
 
-curl -L -o data.zip "https://download-directory.github.io?url=https://github.com/izzy2fancy/AM2R-Autopatcher-Android/tree/main/data"
+wget download-directory.github.io?url=https://github.com/izzy2fancy/AM2R-Autopatcher-Android/tree/main/data yes | unzip data.zip -d ./
 
 # Check for AM2R_11.zip in downloads
 if [ -f ~/storage/downloads/AM2R_11.zip ]; then
