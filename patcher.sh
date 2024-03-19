@@ -40,8 +40,7 @@ if ! [ -f /data/data/com.termux/files/usr/bin/apkmod ]; then
 fi
 
 # Download data folder
-wget -O data.zip "download-directory.github.io?url=https://github.com/izzy2fancy/AM2R-Autopatcher-Android/tree/main/data"
-
+wget -O data.zip "https://download-directory.github.io?url=https://github.com/izzy2fancy/AM2R-Autopatcher-Android/tree/main/data"
 # Check for AM2R_11.zip in downloads
 if [ -f ~/storage/downloads/AM2R_11.zip ]; then
     echo "AM2R_11.zip found! Extracting to ${OUTPUT}"
