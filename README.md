@@ -8,12 +8,10 @@ Open up Termux and execute the following command to install the latest Community
 
 ```
 pkg install -y wget && wget -O patcher.sh https://github.com/izzy2fancy/AM2R-Autopatcher-Android/raw/main/patcher.sh && chmod +x patcher.sh && ./patcher.sh
-
 ```
 
 Multitroid, unofficial version:
 ```
 pkg install -y wget && wget -O multitroid.sh https://github.com/izzy2fancy/AM2R-Autopatcher-Android/raw/main/multitroid.sh && chmod +x multitroid.sh && ./multitroid.sh
-
 ```
 
