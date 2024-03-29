@@ -6,6 +6,8 @@ A repository containing patch data and scripts in order to automatically install
 ### How to use
 Open up Termux and execute the following command to install the latest Community Updates:  
 
+Metroid 1.5.5
+
 ```
 pkg install -y wget && wget -O patcher.sh https://github.com/izzy2fancy/AM2R-Autopatcher-Android/raw/main/patcher.sh && chmod +x patcher.sh && ./patcher.sh
 ```
