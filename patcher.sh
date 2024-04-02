@@ -40,9 +40,7 @@ if ! [ -f /data/data/com.termux/files/usr/bin/apkmod ]; then
 fi
 
 # Download data folder
-
-wget https://github.com/izzy2fancy/AM2R-Autopatcher-Android/releases/download/1.0/data.zip
-yes | unzip data.zip -d ./
+curl -L https://github.com/izzy2fancy/AM2R-Autopatcher-Android/archive/refs/heads/master.zip -o data.zip && unzip data.zip
 
 # Check for AM2R_11.zip in downloads
 if [ -f ~/storage/downloads/AM2R_11.zip ]; then
