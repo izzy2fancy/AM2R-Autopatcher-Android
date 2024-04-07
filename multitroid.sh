@@ -57,8 +57,7 @@ yes | unzip data.zip -d ./
 
 #download multitroid mod
 #check this for more info: https://gist.github.com/steinwaywhw/a4cd19cda655b8249d908261a62687f8
-echo "Downloading Multitroid..."
-curl -s https://api.github.com/repos/DodoBirby/AM2R-Multitroid-Unofficial-Patch/releases/latest | grep "browser_download_url.*Windows.zip" | cut -d : -f 2,3 | tr -d \" | wget -O multitroid.zip -qi -
+wget https://github.com/izzy2fancy/AM2R-Autopatcher-Android/releases/download/3.0/multitroid.zip
 
 #unzip into data/
 unzip -q -o multitroid.zip -d data
